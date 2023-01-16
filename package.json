@@ -1,0 +1,22 @@
+{
+  "name": "selenium-cucumber-java",
+  "version": "1.0.0",
+  "description": "UI Automation Framework using Selenium WebDriver, Cucumber and Java",
+  "main": "index.js",
+  "scripts": {
+    "report": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Agustin Spitale",
+  "license": "ISC",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "devDependencies": {
+    "multiple-cucumber-html-reporter": "^1.21.6"
+  }
+}

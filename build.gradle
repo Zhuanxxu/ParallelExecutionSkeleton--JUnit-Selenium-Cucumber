@@ -1,0 +1,58 @@
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.projectlombok:lombok:1.18.22'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.5.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.1'
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    testImplementation("io.cucumber:cucumber-java:latest.release") {
+        because("we want to use Cucumber JVM")
+    }
+    testImplementation("io.cucumber:cucumber-junit-platform-engine:latest.release") {
+        because("we want to use Cucumber with JUnit 5")
+    }
+    testImplementation("org.junit.platform:junit-platform-suite:latest.release") {
+        because("we want to use the JUnit 5 @Suite annotation to select/run Cucumber tests")
+    }
+    testImplementation("io.github.bonigarcia:webdrivermanager:5.3.1")
+    // https://mvnrepository.com/artifact/io.cucumber/cucumber-picocontainer
+    testImplementation("io.cucumber:cucumber-picocontainer:7.10.1")
+}
+
+//No se para que sirve
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
+}
+
+// gradle clean test -PenvFile=qa.properties
+def envFile = !project.hasProperty("envFile") ? "qa.properties" : project.properties['envFile']
+
+// ACA ESTA LA MAGIA, los primeros metodos son para ubicar donde estan las partes de cucumber como el steps
+// y los features por ultimo se ponen los threads a los que funciona
+def cucumberOptions = [
+                       '-g', 'gradle.cucumber',
+                       '-g', 'cleanTest',
+                       '-g', 'cleanTest.steps',
+                       'src/test/resources',
+                       '--plugin', 'json:docs/cucumber_report.json',
+                        '--threads', '8']
+
+//ACA se llama al cucumber options y la otra parte no se bien para que sirve
+task cucumber() {
+    dependsOn assemble, compileTestJava
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = cucumberOptions
+        }
+    }
+}
